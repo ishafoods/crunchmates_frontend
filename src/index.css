@@ -1,11 +1,19 @@
 :root {
-  font-family: 'Trebuchet MS', 'Gill Sans', 'Noto Sans', sans-serif;
+  font-family: "Trebuchet MS", "Gill Sans", "Noto Sans", sans-serif;
   line-height: 1.5;
   font-weight: 400;
   color: #fdf4e8;
   background:
-    radial-gradient(circle at top left, rgba(255, 169, 47, 0.35), transparent 30%),
-    radial-gradient(circle at right top, rgba(78, 210, 255, 0.2), transparent 28%),
+    radial-gradient(
+      circle at top left,
+      rgba(255, 169, 47, 0.35),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at right top,
+      rgba(78, 210, 255, 0.2),
+      transparent 28%
+    ),
     linear-gradient(180deg, #1d0d07 0%, #120603 45%, #090403 100%);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -41,7 +49,7 @@ body {
 }
 
 body::before {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -112,7 +120,10 @@ select:focus {
   top: 0;
   z-index: 25;
   backdrop-filter: blur(10px);
-  transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease,
+    border-color 0.3s ease;
 }
 
 .site-header--scrolled {
@@ -147,7 +158,7 @@ select:focus {
 h1,
 h2,
 h3 {
-  font-family: 'Franklin Gothic Medium', 'Trebuchet MS', sans-serif;
+  font-family: "Franklin Gothic Medium", "Trebuchet MS", sans-serif;
 }
 
 .brand-mark strong {
@@ -213,7 +224,11 @@ h3 {
 .site-link.active,
 .admin-link.active,
 .filter-chip.active {
-  background: linear-gradient(135deg, rgba(255, 185, 71, 0.22), rgba(255, 109, 47, 0.28));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 185, 71, 0.22),
+    rgba(255, 109, 47, 0.28)
+  );
   border-color: rgba(255, 185, 71, 0.55);
 }
 
@@ -262,17 +277,29 @@ h3 {
   display: grid;
 }
 
-.stack-xl { gap: 2rem; }
-.stack-lg { gap: 1.5rem; }
-.stack-md { gap: 1rem; }
-.stack-sm { gap: 0.6rem; }
+.stack-xl {
+  gap: 2rem;
+}
+.stack-lg {
+  gap: 1.5rem;
+}
+.stack-md {
+  gap: 1rem;
+}
+.stack-sm {
+  gap: 0.6rem;
+}
 
 .panel,
 .site-footer,
 .admin-sidebar,
 .empty-state,
 .auth-panel {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.04)
+  );
   border: 1px solid var(--line);
   backdrop-filter: blur(18px);
   box-shadow: var(--shadow);
@@ -377,7 +404,7 @@ h3 {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin-bottom: 1rem;
+  margin: 1rem 0rem;
 }
 
 .primary-button,
@@ -390,7 +417,11 @@ h3 {
 }
 
 .primary-button {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    var(--accent-strong) 100%
+  );
   color: #130603;
 }
 
@@ -578,13 +609,19 @@ h3 {
 }
 
 .product-visual--small,
-.product-photo--small { height: 230px; }
+.product-photo--small {
+  height: 230px;
+}
 
 .product-visual--medium,
-.product-photo--medium { height: 340px; }
+.product-photo--medium {
+  height: 340px;
+}
 
 .product-visual--large,
-.product-photo--large { height: 520px; }
+.product-photo--large {
+  height: 520px;
+}
 
 .product-photo {
   object-fit: cover;
@@ -594,7 +631,11 @@ h3 {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at center, rgba(255, 255, 255, 0.3), transparent 25%),
+    radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.3),
+      transparent 25%
+    ),
     linear-gradient(180deg, rgba(255, 255, 255, 0.15), transparent 70%);
 }
 
@@ -605,9 +646,27 @@ h3 {
   filter: blur(0.4px);
 }
 
-.visual-chip--one { width: 34px; height: 14px; top: 18%; left: 14%; transform: rotate(18deg); }
-.visual-chip--two { width: 28px; height: 12px; top: 22%; right: 18%; transform: rotate(-28deg); }
-.visual-chip--three { width: 18px; height: 8px; bottom: 14%; left: 20%; transform: rotate(12deg); }
+.visual-chip--one {
+  width: 34px;
+  height: 14px;
+  top: 18%;
+  left: 14%;
+  transform: rotate(18deg);
+}
+.visual-chip--two {
+  width: 28px;
+  height: 12px;
+  top: 22%;
+  right: 18%;
+  transform: rotate(-28deg);
+}
+.visual-chip--three {
+  width: 18px;
+  height: 8px;
+  bottom: 14%;
+  left: 20%;
+  transform: rotate(12deg);
+}
 
 .visual-bowl {
   position: absolute;
@@ -744,7 +803,8 @@ h3 {
   height: 14px;
   border-radius: 999px;
   background: var(--feature-accent, var(--accent));
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--feature-accent, var(--accent)) 20%, transparent);
+  box-shadow: 0 0 0 6px
+    color-mix(in srgb, var(--feature-accent, var(--accent)) 20%, transparent);
 }
 
 .showcase-hero {
@@ -993,17 +1053,19 @@ h3 {
   color: var(--text) !important;
   box-shadow: none !important;
   border-radius: 18px !important;
+  margin: 0.5rem 0 !important;
 }
 
 .detail-accordion::before {
   display: none;
+  margin: 1rem;
 }
 
 .pill-row {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
-  margin-bottom: 1rem;
+  margin: 1rem 0rem;
 }
 
 .copy-grid,
@@ -1159,7 +1221,7 @@ h3 {
   margin-top: 0.45rem;
 }
 
-.color-picker-field input[type='color'] {
+.color-picker-field input[type="color"] {
   height: 3.25rem;
   padding: 0.35rem;
   cursor: pointer;
@@ -1318,7 +1380,11 @@ h3 {
   height: 28rem;
   top: -10rem;
   left: -12rem;
-  background: radial-gradient(circle, rgba(255, 170, 65, 0.22), transparent 72%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 170, 65, 0.22),
+    transparent 72%
+  );
 }
 
 .bg-orb-two {
@@ -1326,7 +1392,11 @@ h3 {
   height: 24rem;
   right: -8rem;
   top: 8rem;
-  background: radial-gradient(circle, rgba(52, 164, 255, 0.16), transparent 72%);
+  background: radial-gradient(
+    circle,
+    rgba(52, 164, 255, 0.16),
+    transparent 72%
+  );
 }
 
 .bg-orb-three {
@@ -1338,8 +1408,15 @@ h3 {
 }
 
 @keyframes drift {
-  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.35; }
-  50% { transform: scale(1.04) rotate(12deg); opacity: 0.62; }
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.04) rotate(12deg);
+    opacity: 0.62;
+  }
 }
 
 @media (max-width: 1100px) {
