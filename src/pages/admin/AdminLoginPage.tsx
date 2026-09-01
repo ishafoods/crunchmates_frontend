@@ -5,9 +5,11 @@ import { Alert, Button, Stack, TextField } from '@mui/material'
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useStore } from '../../store/useStore'
+import { useNotification } from '../../notifications/useNotification'
 
 export function AdminLoginPage() {
   const { admin, loginAdmin } = useStore()
+  const { notifySuccess, notifyError } = useNotification()
   const navigate = useNavigate()
   const location = useLocation()
   const [error, setError] = useState('')
@@ -23,8 +25,11 @@ export function AdminLoginPage() {
     const success = await loginAdmin(form.email, form.password)
     if (!success) {
       setError('Use the demo admin credentials shown on this page.')
+      notifyError(null, 'Sign in failed. Check your credentials.')
       return
     }
+
+    notifySuccess('Signed in to the admin workspace')
 
     const from =
       typeof location.state === 'object' && location.state && 'from' in location.state

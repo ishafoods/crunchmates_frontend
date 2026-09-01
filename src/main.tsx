@@ -4,6 +4,7 @@ import { CssBaseline, ThemeProvider } from '@mui/material'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
+import { NotificationProvider } from './notifications/NotificationProvider'
 import { StoreProvider } from './store/StoreContext'
 import { appTheme } from './theme'
 
@@ -12,9 +13,11 @@ createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={appTheme}>
       <CssBaseline />
       <BrowserRouter>
-        <StoreProvider>
-          <App />
-        </StoreProvider>
+        <NotificationProvider>
+          <StoreProvider>
+            <App />
+          </StoreProvider>
+        </NotificationProvider>
       </BrowserRouter>
     </ThemeProvider>
   </StrictMode>,

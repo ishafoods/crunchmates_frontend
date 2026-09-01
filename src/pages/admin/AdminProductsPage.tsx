@@ -5,6 +5,7 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import EditRoundedIcon from '@mui/icons-material/EditRounded'
 import { Button, IconButton, TextField, Tooltip, Typography } from '@mui/material'
 import { useStore } from '../../store/useStore'
+import { useNotification } from '../../notifications/useNotification'
 import type { Product } from '../../types'
 
 const emptyForm = {
@@ -35,8 +36,10 @@ function readFileAsDataUrl(file: File) {
 
 export function AdminProductsPage() {
   const { products, addProduct, updateProduct, deleteProduct } = useStore()
+  const { notifySuccess, notifyError } = useNotification()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
+  const [saving, setSaving] = useState(false)
   const [form, setForm] = useState(emptyForm)
 
   const editingProduct = useMemo(
@@ -59,9 +62,14 @@ export function AdminProductsPage() {
       return
     }
 
-    await deleteProduct(product.id)
-    if (editingId === product.id) {
-      resetForm()
+    try {
+      await deleteProduct(product.id)
+      notifySuccess(`${product.name} ${product.flavor} deleted`)
+      if (editingId === product.id) {
+        resetForm()
+      }
+    } catch (error) {
+      notifyError(error, 'Unable to delete this product')
     }
   }
 
@@ -87,41 +95,55 @@ export function AdminProductsPage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
 
-    const image = imageFile ? await readFileAsDataUrl(imageFile) : undefined
-
-    if (editingProduct) {
-      await updateProduct(editingProduct.id, {
-        name: form.name,
-        flavor: form.flavor,
-        tagline: form.tagline,
-        description: form.description,
-        price: Number(form.price),
-        badge: form.badge,
-        category: form.category,
-        ingredients: form.ingredients
-          .split(',')
-          .map((item) => item.trim())
-          .filter(Boolean),
-        features: form.features
-          .split(',')
-          .map((item) => item.trim())
-          .filter(Boolean),
-        nutrition: form.nutrition
-          .split(',')
-          .map((item) => item.trim())
-          .filter(Boolean),
-        tone: {
-          background: `linear-gradient(160deg, ${form.background} 0%, ${form.accent} 100%)`,
-          accent: form.accent,
-          highlight: form.highlight,
-        },
-        image,
-      })
-    } else {
-      await addProduct(form, image)
+    if (!form.name.trim() || !form.flavor.trim() || !form.price.trim()) {
+      notifyError(null, 'Name, flavor and price are required')
+      return
     }
 
-    resetForm()
+    setSaving(true)
+    try {
+      const image = imageFile ? await readFileAsDataUrl(imageFile) : undefined
+
+      if (editingProduct) {
+        await updateProduct(editingProduct.id, {
+          name: form.name,
+          flavor: form.flavor,
+          tagline: form.tagline,
+          description: form.description,
+          price: Number(form.price),
+          badge: form.badge,
+          category: form.category,
+          ingredients: form.ingredients
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean),
+          features: form.features
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean),
+          nutrition: form.nutrition
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean),
+          tone: {
+            background: `linear-gradient(160deg, ${form.background} 0%, ${form.accent} 100%)`,
+            accent: form.accent,
+            highlight: form.highlight,
+          },
+          image,
+        })
+        notifySuccess(`${form.name} ${form.flavor} updated`)
+      } else {
+        await addProduct(form, image)
+        notifySuccess(`${form.name} ${form.flavor} added to the catalog`)
+      }
+
+      resetForm()
+    } catch (error) {
+      notifyError(error, 'Unable to save this product')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -156,8 +178,8 @@ export function AdminProductsPage() {
             </div>
           </div>
           <div className="hero-actions">
-            <Button type="submit" className="primary-button" variant="contained" startIcon={<AddRoundedIcon />}>
-              {editingProduct ? 'Save changes' : 'Add product'}
+            <Button type="submit" className="primary-button" variant="contained" disabled={saving} startIcon={<AddRoundedIcon />}>
+              {saving ? 'Saving' : editingProduct ? 'Save changes' : 'Add product'}
             </Button>
             <Button type="button" className="secondary-button" variant="outlined" onClick={resetForm}>
               Reset

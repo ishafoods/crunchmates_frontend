@@ -12,6 +12,7 @@ import type {
   UserProfile,
 } from '../types'
 import { StoreContext } from './StoreContextDefinition'
+import { openRazorpayCheckout, type RazorpaySuccess } from '../razorpay'
 
 const STORAGE_KEY = 'crunchmates-store-v1'
 
@@ -62,6 +63,10 @@ type Action =
   | { type: 'orders/place'; order: Order }
   | { type: 'orders/updateStatus'; orderId: string; status: Order['status'] }
 
+// Only the session identity is persisted; catalog, cart and orders are re-fetched from the API,
+// and product images are large enough to blow the localStorage quota.
+type PersistedState = Pick<StoreState, 'user' | 'admin'>
+
 function createInitialState(): StoreState {
   const fallback: StoreState = {
     products: defaultProducts,
@@ -82,12 +87,9 @@ function createInitialState(): StoreState {
   }
 
   try {
-    const parsed = JSON.parse(raw) as Partial<StoreState>
+    const parsed = JSON.parse(raw) as Partial<PersistedState>
     return {
-      products: parsed.products?.length ? parsed.products : defaultProducts,
-      content: parsed.content ? { ...defaultContent, ...parsed.content } : defaultContent,
-      cart: parsed.cart ?? [],
-      orders: parsed.orders ?? [],
+      ...fallback,
       user: parsed.user ?? null,
       admin: parsed.admin ?? null,
     }
@@ -249,8 +251,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    if (typeof window !== 'undefined') window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-  }, [state])
+    if (typeof window === 'undefined') return
+    const persisted: PersistedState = { user: state.user, admin: state.admin }
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted))
+    } catch (error) {
+      console.warn('Unable to persist session state', error)
+    }
+  }, [state.user, state.admin])
 
   const value = useMemo<StoreApi>(() => {
     const productsBySlug = buildProductMap(state.products)
@@ -344,9 +352,38 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           return null
         }
 
-        const order = await api.placeOrder(form)
-        dispatch({ type: 'orders/place', order })
-        return order
+        const { order, razorpay } = await api.placeOrder(form)
+
+        if (!razorpay) {
+          dispatch({ type: 'orders/place', order })
+          return order
+        }
+
+        let payment: RazorpaySuccess | null
+        try {
+          payment = await openRazorpayCheckout({
+            order: razorpay,
+            name: 'Crunchmates',
+            description: `Order ${order.id}`,
+            prefill: { name: form.customerName, email: form.customerEmail, contact: form.customerPhone },
+          })
+        } catch (error) {
+          await api.markPaymentFailed(order.id).catch(() => undefined)
+          throw error
+        }
+
+        if (!payment) {
+          await api.markPaymentFailed(order.id).catch(() => undefined)
+          throw new Error('Payment was cancelled before it completed')
+        }
+
+        const paidOrder = await api.verifyPayment(order.id, {
+          razorpayOrderId: payment.razorpay_order_id,
+          razorpayPaymentId: payment.razorpay_payment_id,
+          razorpaySignature: payment.razorpay_signature,
+        })
+        dispatch({ type: 'orders/place', order: paidOrder })
+        return paidOrder
       },
       updateOrderStatus: async (orderId: string, status: Order['status']) => { const order = await api.updateOrderStatus(orderId, status); dispatch({ type: 'orders/updateStatus', orderId, status: order.status }) },
     }

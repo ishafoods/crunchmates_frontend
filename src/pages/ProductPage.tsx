@@ -18,11 +18,13 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ProductVisual } from '../components/ProductVisual'
 import { useStore } from '../store/useStore'
+import { useNotification } from '../notifications/useNotification'
 
 export function ProductPage() {
   const { slug } = useParams()
   const navigate = useNavigate()
   const { productsBySlug, addToCart } = useStore()
+  const { notifySuccess, notifyError } = useNotification()
   const product = slug ? productsBySlug[slug] : undefined
   const [quantity, setQuantity] = useState(1)
 
@@ -36,6 +38,15 @@ export function ProductPage() {
         </Link>
       </div>
     )
+  }
+
+  const handleAddToCart = async () => {
+    try {
+      await addToCart(product.id, quantity)
+      notifySuccess(`${quantity} x ${product.flavor} added to cart`)
+    } catch (error) {
+      notifyError(error, 'Unable to add this item to your cart')
+    }
   }
 
   return (
@@ -96,7 +107,7 @@ export function ProductPage() {
               type="button"
               className="primary-button"
               variant="contained"
-              onClick={() => addToCart(product.id, quantity)}
+              onClick={() => void handleAddToCart()}
               startIcon={<LocalMallRoundedIcon />}
             >
               Add to cart

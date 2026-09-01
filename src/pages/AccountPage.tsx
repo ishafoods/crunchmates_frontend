@@ -4,9 +4,11 @@ import LoginRoundedIcon from '@mui/icons-material/LoginRounded'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import { Button, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { useStore } from '../store/useStore'
+import { useNotification } from '../notifications/useNotification'
 
 export function AccountPage() {
   const { user, loginUser, logoutUser, orders } = useStore()
+  const { notifySuccess, notifyError } = useNotification()
   const [mode, setMode] = useState<'login' | 'register'>(user ? 'login' : 'login')
   const [form, setForm] = useState({ name: user?.name ?? '', email: user?.email ?? '' })
 
@@ -19,10 +21,16 @@ export function AccountPage() {
     event.preventDefault()
 
     if (!form.name || !form.email) {
+      notifyError(null, 'Enter your name and email to continue')
       return
     }
 
-    await loginUser({ name: form.name, email: form.email })
+    try {
+      await loginUser({ name: form.name, email: form.email })
+      notifySuccess(`Signed in as ${form.email}`)
+    } catch (error) {
+      notifyError(error, 'Unable to sign in right now')
+    }
   }
 
   if (user) {
@@ -33,7 +41,7 @@ export function AccountPage() {
             <p className="section-kicker">Account</p>
             <h1>Welcome back, {user.name}.</h1>
           </div>
-          <Button type="button" className="ghost-button" variant="outlined" onClick={logoutUser} startIcon={<LogoutRoundedIcon />}>
+          <Button type="button" className="ghost-button" variant="outlined" onClick={() => { logoutUser(); notifySuccess('Signed out') }} startIcon={<LogoutRoundedIcon />}>
             Sign out
           </Button>
         </section>
@@ -66,6 +74,9 @@ export function AccountPage() {
                     <h3>{order.id}</h3>
                     <p>
                       {order.items.length} items and {order.status}
+                    </p>
+                    <p>
+                      {order.paymentMethod === 'cod' ? 'Cash on delivery' : 'Razorpay'} and payment {order.paymentStatus ?? 'pending'}
                     </p>
                   </div>
                   <strong>INR {order.total}</strong>

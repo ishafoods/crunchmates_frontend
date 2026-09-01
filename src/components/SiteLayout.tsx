@@ -1,8 +1,10 @@
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
 import LocalMallRoundedIcon from '@mui/icons-material/LocalMallRounded'
+import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded'
-import { Chip, Container, Stack, Typography } from '@mui/material'
+import { Chip, Container, IconButton, Stack, Typography } from '@mui/material'
 import { motion } from 'framer-motion'
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
@@ -66,9 +68,14 @@ export function SiteLayout() {
             </span>
           </NavLink>
 
-          {/* <IconButton className="menu-toggle" onClick={() => setMenuOpen((open) => !open)}>
+          <IconButton
+            className="menu-toggle"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
             {menuOpen ? <CloseRoundedIcon /> : <MenuRoundedIcon />}
-          </IconButton> */}
+          </IconButton>
 
           <nav className={`site-nav ${menuOpen ? 'open' : ''}`}>
             {navItems.map((item) => (

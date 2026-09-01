@@ -6,6 +6,9 @@ const SESSION_KEY = 'crunchmates-session-id'
 
 type CartResponse = { items: Array<{ productId: string; quantity: number }>; cartCount: number; cartTotal: number }
 type CatalogResponse = { products: Product[]; content: SiteContent }
+export type RazorpayOrderInfo = { keyId: string; orderId: string; amount: number; currency: string }
+export type PlaceOrderResponse = { order: Order; razorpay: RazorpayOrderInfo | null }
+export type PaymentVerification = { razorpayOrderId: string; razorpayPaymentId: string; razorpaySignature: string }
 
 function sessionId() {
   let value = localStorage.getItem(SESSION_KEY)
@@ -43,7 +46,10 @@ export const api = {
   adminLogin: (email: string, password: string) => request<{ token: string; admin: { email: string } }>('/auth/admin/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
   orders: () => request<Order[]>('/orders/me'),
   adminOrders: () => request<Order[]>('/admin/orders'),
-  placeOrder: (form: CheckoutForm) => request<Order>('/orders', { method: 'POST', body: JSON.stringify(form) }),
+  placeOrder: (form: CheckoutForm) => request<PlaceOrderResponse>('/orders', { method: 'POST', body: JSON.stringify(form) }),
+  verifyPayment: (orderId: string, payload: PaymentVerification) => request<Order>(`/orders/${orderId}/verify-payment`, { method: 'POST', body: JSON.stringify(payload) }),
+  markPaymentFailed: (orderId: string) => request<Order>(`/orders/${orderId}/payment-failed`, { method: 'POST' }),
+  paymentConfig: () => request<{ razorpayEnabled: boolean; keyId: string; currency: string }>('/orders/payment-config'),
   addProduct: (product: Omit<Product, 'id' | 'slug'>) => request<Product>('/products', { method: 'POST', body: JSON.stringify(product) }),
   updateProduct: (id: string, values: Partial<Product>) => request<Product>(`/products/${id}`, { method: 'PATCH', body: JSON.stringify(values) }),
   deleteProduct: (id: string) => request<void>(`/products/${id}`, { method: 'DELETE' }),

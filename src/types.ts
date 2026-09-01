@@ -76,16 +76,25 @@ export type OrderItem = {
   quantity: number
 }
 
+export type PaymentMethod = 'razorpay' | 'cod'
+export type PaymentStatus = 'pending' | 'paid' | 'failed'
+
 export type Order = {
   id: string
   customerName: string
   customerEmail: string
+  customerPhone?: string
   address: string
   city: string
   status: 'Processing' | 'Packed' | 'Shipped' | 'Delivered'
   createdAt: string
   items: OrderItem[]
   total: number
+  currency?: string
+  paymentMethod?: PaymentMethod
+  paymentStatus?: PaymentStatus
+  razorpayOrderId?: string
+  razorpayPaymentId?: string
 }
 
 export type UserProfile = {
@@ -100,8 +109,10 @@ export type AdminProfile = {
 export type CheckoutForm = {
   customerName: string
   customerEmail: string
+  customerPhone: string
   address: string
   city: string
+  paymentMethod: PaymentMethod
 }
 
 export type ProductFormValues = {

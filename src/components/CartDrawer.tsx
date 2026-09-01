@@ -13,6 +13,7 @@ import {
 } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useStore } from '../store/useStore'
+import { useNotification } from '../notifications/useNotification'
 
 type Props = {
   open: boolean
@@ -21,6 +22,24 @@ type Props = {
 
 export function CartDrawer({ open, onClose }: Props) {
   const { cart, products, cartTotal, updateCartQuantity, removeFromCart } = useStore()
+  const { notifySuccess, notifyError } = useNotification()
+
+  const handleQuantity = async (productId: string, quantity: number) => {
+    try {
+      await updateCartQuantity(productId, quantity)
+    } catch (error) {
+      notifyError(error, 'Unable to update the quantity')
+    }
+  }
+
+  const handleRemove = async (productId: string, flavor: string) => {
+    try {
+      await removeFromCart(productId)
+      notifySuccess(`${flavor} removed from cart`)
+    } catch (error) {
+      notifyError(error, 'Unable to remove this item')
+    }
+  }
 
   const items = cart
     .map((item) => ({
@@ -38,8 +57,8 @@ export function CartDrawer({ open, onClose }: Props) {
         paper: {
           sx: {
             width: { xs: '100%', sm: 420 },
-            background: 'linear-gradient(180deg, #052ca3 0%, #031b72 100%)',
-            color: '#fff',
+            background: '#ffffff',
+            color: '#14110f',
             p: 2,
           },
         },
@@ -48,16 +67,16 @@ export function CartDrawer({ open, onClose }: Props) {
       <Stack spacing={2} sx={{ height: '100%' }}>
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant="h5">YOUR CRUNCH BAG</Typography>
-          <IconButton onClick={onClose} sx={{ color: '#fff' }}>
+          <IconButton onClick={onClose} sx={{ color: 'text.primary' }}>
             <CloseRoundedIcon />
           </IconButton>
         </Stack>
 
-        <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
+        <Divider />
 
         <Stack spacing={2} sx={{ flex: 1, overflowY: 'auto', pr: 1 }}>
           {!items.length ? (
-            <Typography sx={{ color: 'rgba(255,255,255,0.8)' }}>Your crunch bag is empty.</Typography>
+            <Typography sx={{ color: 'text.secondary' }}>Your crunch bag is empty.</Typography>
           ) : (
             items.map(({ product, quantity }) => {
               if (!product) {
@@ -71,10 +90,10 @@ export function CartDrawer({ open, onClose }: Props) {
                   spacing={1.2}
                   sx={{
                     alignItems: 'center',
-                    border: '1px solid rgba(255,255,255,0.16)',
+                    border: '1px solid rgba(20,17,15,0.12)',
                     borderRadius: '18px',
                     p: 1,
-                    background: 'rgba(255,255,255,0.05)',
+                    background: '#fbf9f5',
                   }}
                 >
                   <Box
@@ -85,28 +104,28 @@ export function CartDrawer({ open, onClose }: Props) {
                   />
                   <Box sx={{ flex: 1 }}>
                     <Typography sx={{ fontWeight: 700 }}>{product.flavor}</Typography>
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.75)' }}>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                       {product.price > 0 ? `INR ${product.price}` : product.priceNote ?? 'Price TBA'}
                     </Typography>
                     <Stack direction="row" spacing={0.8} sx={{ mt: 0.6, alignItems: 'center' }}>
                       <IconButton
                         size="small"
-                        onClick={() => updateCartQuantity(product.id, quantity - 1)}
-                        sx={{ color: '#fff', border: '1px solid rgba(255,255,255,0.24)' }}
+                        onClick={() => void handleQuantity(product.id, quantity - 1)}
+                        sx={{ color: 'text.primary', border: '1px solid rgba(20,17,15,0.16)' }}
                       >
                         <RemoveRoundedIcon fontSize="small" />
                       </IconButton>
                       <Typography>{quantity}</Typography>
                       <IconButton
                         size="small"
-                        onClick={() => updateCartQuantity(product.id, quantity + 1)}
-                        sx={{ color: '#fff', border: '1px solid rgba(255,255,255,0.24)' }}
+                        onClick={() => void handleQuantity(product.id, quantity + 1)}
+                        sx={{ color: 'text.primary', border: '1px solid rgba(20,17,15,0.16)' }}
                       >
                         <AddRoundedIcon fontSize="small" />
                       </IconButton>
                     </Stack>
                   </Box>
-                  <IconButton onClick={() => removeFromCart(product.id)} sx={{ color: '#fff' }}>
+                  <IconButton onClick={() => void handleRemove(product.id, product.flavor)} sx={{ color: 'text.primary' }}>
                     <DeleteOutlineRoundedIcon />
                   </IconButton>
                 </Stack>
@@ -115,11 +134,11 @@ export function CartDrawer({ open, onClose }: Props) {
           )}
         </Stack>
 
-        <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
+        <Divider />
 
         <Stack spacing={1.2}>
           <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography sx={{ color: 'rgba(255,255,255,0.8)' }}>Subtotal</Typography>
+            <Typography sx={{ color: 'text.secondary' }}>Subtotal</Typography>
             <Typography variant="h6">INR {cartTotal}</Typography>
           </Stack>
           <Button
@@ -129,7 +148,8 @@ export function CartDrawer({ open, onClose }: Props) {
             variant="contained"
             sx={{
               minHeight: 48,
-              background: 'linear-gradient(135deg, #E21B12 0%, #A90000 100%)',
+              background: 'linear-gradient(135deg, #ff9f1a 0%, #e2231a 100%)',
+              color: '#ffffff',
             }}
           >
             CHECKOUT →

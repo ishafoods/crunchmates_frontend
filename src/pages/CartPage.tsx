@@ -5,9 +5,28 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import { Button, IconButton, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useStore } from '../store/useStore'
+import { useNotification } from '../notifications/useNotification'
 
 export function CartPage() {
   const { cart, products, cartTotal, updateCartQuantity, removeFromCart } = useStore()
+  const { notifySuccess, notifyError } = useNotification()
+
+  const handleQuantity = async (productId: string, quantity: number) => {
+    try {
+      await updateCartQuantity(productId, quantity)
+    } catch (error) {
+      notifyError(error, 'Unable to update the quantity')
+    }
+  }
+
+  const handleRemove = async (productId: string, flavor: string) => {
+    try {
+      await removeFromCart(productId)
+      notifySuccess(`${flavor} removed from cart`)
+    } catch (error) {
+      notifyError(error, 'Unable to remove this item')
+    }
+  }
 
   const items = cart
     .map((item) => ({
@@ -57,16 +76,16 @@ export function CartPage() {
                 </div>
 
                 <div className="quantity-row">
-                  <IconButton type="button" onClick={() => updateCartQuantity(product.id, quantity - 1)}>
+                  <IconButton type="button" onClick={() => void handleQuantity(product.id, quantity - 1)}>
                     <RemoveRoundedIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                   <strong>{quantity}</strong>
-                  <IconButton type="button" onClick={() => updateCartQuantity(product.id, quantity + 1)}>
+                  <IconButton type="button" onClick={() => void handleQuantity(product.id, quantity + 1)}>
                     <AddRoundedIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </div>
 
-                <Button type="button" className="ghost-button" variant="outlined" onClick={() => removeFromCart(product.id)} startIcon={<DeleteOutlineRoundedIcon />}>
+                <Button type="button" className="ghost-button" variant="outlined" onClick={() => void handleRemove(product.id, product.flavor)} startIcon={<DeleteOutlineRoundedIcon />}>
                   Remove
                 </Button>
               </article>

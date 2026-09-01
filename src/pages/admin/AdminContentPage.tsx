@@ -5,10 +5,12 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import EditRoundedIcon from '@mui/icons-material/EditRounded'
 import { Button, IconButton, TextField, Tooltip, Typography } from '@mui/material'
 import { useStore } from '../../store/useStore'
+import { useNotification } from '../../notifications/useNotification'
 import type { ShowcaseImage, SiteStat } from '../../types'
 
 export function AdminContentPage() {
   const { content, updateContent } = useStore()
+  const { notifySuccess, notifyError } = useNotification()
   const [heroTitle, setHeroTitle] = useState(content.heroTitle)
   const [heroSubtitle, setHeroSubtitle] = useState(content.heroSubtitle)
   const [announcement, setAnnouncement] = useState(content.announcement)
@@ -38,13 +40,18 @@ export function AdminContentPage() {
 
   const handleSaveHero = async (event: FormEvent) => {
     event.preventDefault()
-    await updateContent({
-      heroTitle, heroSubtitle, announcement, storyText,
-      spiceMeterTitle, spiceMeterText, spiceMeterValue: Number(spiceMeterValue), spiceMeterStartLabel, spiceMeterEndLabel,
-      snackMomentsTitle, snackMoments: snackMoments.split(',').map((item) => item.trim()).filter(Boolean),
-      socialProofTitle, socialProofQuotes: socialProofQuotes.split('\n').map((item) => item.trim()).filter(Boolean),
-      newsletterTitle, newsletterText, newsletterCta, finalCtaTitle, finalCtaPrimary, finalCtaSecondary,
-    })
+    try {
+      await updateContent({
+        heroTitle, heroSubtitle, announcement, storyText,
+        spiceMeterTitle, spiceMeterText, spiceMeterValue: Number(spiceMeterValue), spiceMeterStartLabel, spiceMeterEndLabel,
+        snackMomentsTitle, snackMoments: snackMoments.split(',').map((item) => item.trim()).filter(Boolean),
+        socialProofTitle, socialProofQuotes: socialProofQuotes.split('\n').map((item) => item.trim()).filter(Boolean),
+        newsletterTitle, newsletterText, newsletterCta, finalCtaTitle, finalCtaPrimary, finalCtaSecondary,
+      })
+      notifySuccess('Page content saved')
+    } catch (error) {
+      notifyError(error, 'Unable to save page content')
+    }
   }
 
   const handleStatImage = (event: ChangeEvent<HTMLInputElement>) => {
@@ -58,15 +65,23 @@ export function AdminContentPage() {
   const saveStat = async () => {
     const label = statDraft.label.trim()
     const value = statDraft.value.trim()
-    if (!label || !value) return
+    if (!label || !value) {
+      notifyError(null, 'A stat needs both a label and a value')
+      return
+    }
 
     const nextStat = { label, value, image: statDraft.image }
     const stats = editingStatLabel
       ? content.stats.map((stat) => (stat.label === editingStatLabel ? nextStat : stat))
       : [...content.stats, nextStat]
-    await updateContent({ stats })
-    setEditingStatLabel(null)
-    setStatDraft({ label: '', value: '' })
+    try {
+      await updateContent({ stats })
+      notifySuccess(editingStatLabel ? 'Stat updated' : 'Stat added')
+      setEditingStatLabel(null)
+      setStatDraft({ label: '', value: '' })
+    } catch (error) {
+      notifyError(error, 'Unable to save this stat')
+    }
   }
 
   const editStat = (stat: SiteStat) => {
@@ -76,10 +91,15 @@ export function AdminContentPage() {
 
   const deleteStat = async (label: string) => {
     if (!window.confirm(`Delete the ${label} stat?`)) return
-    await updateContent({ stats: content.stats.filter((stat) => stat.label !== label) })
-    if (editingStatLabel === label) {
-      setEditingStatLabel(null)
-      setStatDraft({ label: '', value: '' })
+    try {
+      await updateContent({ stats: content.stats.filter((stat) => stat.label !== label) })
+      notifySuccess('Stat deleted')
+      if (editingStatLabel === label) {
+        setEditingStatLabel(null)
+        setStatDraft({ label: '', value: '' })
+      }
+    } catch (error) {
+      notifyError(error, 'Unable to delete this stat')
     }
   }
 
@@ -92,14 +112,22 @@ export function AdminContentPage() {
   }
 
   const saveShowcaseImage = async () => {
-    if (!showcaseDraft.title.trim() || !showcaseDraft.text.trim() || !showcaseDraft.image) return
+    if (!showcaseDraft.title.trim() || !showcaseDraft.text.trim() || !showcaseDraft.image) {
+      notifyError(null, 'A showcase card needs a title, text and an image')
+      return
+    }
     const item = { ...showcaseDraft, title: showcaseDraft.title.trim(), text: showcaseDraft.text.trim(), id: editingShowcaseId ?? `${Date.now()}` }
     const showcaseImages = editingShowcaseId
       ? content.showcaseImages.map((current) => (current.id === editingShowcaseId ? item : current))
       : [...content.showcaseImages, item]
-    await updateContent({ showcaseImages })
-    setEditingShowcaseId(null)
-    setShowcaseDraft({ id: '', image: '', title: '', text: '' })
+    try {
+      await updateContent({ showcaseImages })
+      notifySuccess(editingShowcaseId ? 'Showcase card updated' : 'Showcase card added')
+      setEditingShowcaseId(null)
+      setShowcaseDraft({ id: '', image: '', title: '', text: '' })
+    } catch (error) {
+      notifyError(error, 'Unable to save this showcase card')
+    }
   }
 
   const editShowcaseImage = (item: ShowcaseImage) => {
@@ -109,7 +137,12 @@ export function AdminContentPage() {
 
   const deleteShowcaseImage = async (id: string) => {
     if (!window.confirm('Delete this showcase image?')) return
-    await updateContent({ showcaseImages: content.showcaseImages.filter((item) => item.id !== id) })
+    try {
+      await updateContent({ showcaseImages: content.showcaseImages.filter((item) => item.id !== id) })
+      notifySuccess('Showcase image deleted')
+    } catch (error) {
+      notifyError(error, 'Unable to delete this showcase image')
+    }
   }
 
   const handleBlockImage = (event: ChangeEvent<HTMLInputElement>) => {
@@ -122,6 +155,7 @@ export function AdminContentPage() {
 
   const addBlock = async () => {
     if (!blockDraft.title || !blockDraft.text) {
+      notifyError(null, 'A feature block needs a title and text')
       return
     }
 
@@ -136,10 +170,15 @@ export function AdminContentPage() {
       ? content.blocks.map((item) => (item.id === editingBlockId ? block : item))
       : [...content.blocks, block]
 
-    await updateContent({ blocks })
-    setEditingBlockId(null)
-    setBlockImage(undefined)
-    setBlockDraft({ title: '', text: '', accent: '#ffb739' })
+    try {
+      await updateContent({ blocks })
+      notifySuccess(editingBlockId ? 'Feature block updated' : 'Feature block added')
+      setEditingBlockId(null)
+      setBlockImage(undefined)
+      setBlockDraft({ title: '', text: '', accent: '#ffb739' })
+    } catch (error) {
+      notifyError(error, 'Unable to save this feature block')
+    }
   }
 
   const editBlock = (block: (typeof content.blocks)[number]) => {
@@ -153,11 +192,16 @@ export function AdminContentPage() {
       return
     }
 
-    await updateContent({ blocks: content.blocks.filter((block) => block.id !== blockId) })
-    if (editingBlockId === blockId) {
-      setEditingBlockId(null)
-      setBlockDraft({ title: '', text: '', accent: '#ffb739' })
-      setBlockImage(undefined)
+    try {
+      await updateContent({ blocks: content.blocks.filter((block) => block.id !== blockId) })
+      notifySuccess('Feature block deleted')
+      if (editingBlockId === blockId) {
+        setEditingBlockId(null)
+        setBlockDraft({ title: '', text: '', accent: '#ffb739' })
+        setBlockImage(undefined)
+      }
+    } catch (error) {
+      notifyError(error, 'Unable to delete this feature block')
     }
   }
 

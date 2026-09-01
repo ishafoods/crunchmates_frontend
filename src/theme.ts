@@ -2,24 +2,29 @@ import { createTheme } from '@mui/material/styles'
 
 export const appTheme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: 'light',
     primary: {
-      main: '#ffb947',
-      contrastText: '#130603',
+      main: '#ff9f1a',
+      contrastText: '#14110f',
     },
     secondary: {
-      main: '#ff6d2f',
+      main: '#e2231a',
+      contrastText: '#ffffff',
     },
     background: {
-      default: '#090403',
-      paper: 'rgba(27, 13, 7, 0.82)',
+      default: '#ffffff',
+      paper: '#ffffff',
     },
     text: {
-      primary: '#f8e8d6',
-      secondary: '#d5bda0',
+      primary: '#14110f',
+      secondary: '#5f5852',
     },
+    divider: 'rgba(20, 17, 15, 0.12)',
     success: {
-      main: '#5bdf84',
+      main: '#1f9254',
+    },
+    error: {
+      main: '#e2231a',
     },
   },
   shape: {
@@ -29,11 +34,13 @@ export const appTheme = createTheme({
     fontFamily: "'Trebuchet MS', 'Gill Sans', 'Noto Sans', sans-serif",
     h1: {
       fontFamily: "'Franklin Gothic Medium', 'Trebuchet MS', sans-serif",
-      fontWeight: 700,
+      fontWeight: 800,
+      textTransform: 'uppercase',
     },
     h2: {
       fontFamily: "'Franklin Gothic Medium', 'Trebuchet MS', sans-serif",
-      fontWeight: 700,
+      fontWeight: 800,
+      textTransform: 'uppercase',
     },
     h3: {
       fontFamily: "'Franklin Gothic Medium', 'Trebuchet MS', sans-serif",
@@ -51,13 +58,13 @@ export const appTheme = createTheme({
           borderRadius: 999,
           paddingInline: '1.1rem',
           minHeight: 48,
+          boxShadow: 'none',
         },
       },
     },
     MuiPaper: {
       styleOverrides: {
         root: {
-          backdropFilter: 'blur(18px)',
           backgroundImage: 'none',
         },
       },
