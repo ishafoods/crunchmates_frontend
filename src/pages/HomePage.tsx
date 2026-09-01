@@ -1,41 +1,41 @@
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
-import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
+// import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import CelebrationRoundedIcon from "@mui/icons-material/CelebrationRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import RestaurantRoundedIcon from "@mui/icons-material/RestaurantRounded";
 import { Button, Grid, LinearProgress, Stack, Typography } from "@mui/material";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FlavorCarousel } from "../components/FlavorCarousel";
-import { ProductVisual } from "../components/ProductVisual";
+// import { ProductVisual } from "../components/ProductVisual";
 import { SectionReveal } from "../components/SectionReveal";
 import { useStore } from "../store/useStore";
 import Img from "../assets/crunchmates-removebg-preview.png";
 
 export function HomePage() {
   const { content, featuredProducts } = useStore();
-  const [heroSlide, setHeroSlide] = useState(0);
-  const heroProduct = featuredProducts[heroSlide] ?? featuredProducts[0];
+  // const [heroSlide, setHeroSlide] = useState(0);
+  // const heroProduct = featuredProducts[heroSlide] ?? featuredProducts[0];
   const comingSoon = featuredProducts.filter((product) => product.comingSoon);
 
-  useEffect(() => {
-    if (featuredProducts.length < 2) return;
-    const timer = window.setInterval(() => {
-      setHeroSlide((current) => (current + 1) % featuredProducts.length);
-    }, 10000);
-    return () => window.clearInterval(timer);
-  }, [featuredProducts.length]);
+  // useEffect(() => {
+  //   if (featuredProducts.length < 2) return;
+  //   const timer = window.setInterval(() => {
+  //     setHeroSlide((current) => (current + 1) % featuredProducts.length);
+  //   }, 10000);
+  //   return () => window.clearInterval(timer);
+  // }, [featuredProducts.length]);
 
-  const showPreviousHeroSlide = () => {
-    setHeroSlide(
-      (current) => (current - 1 + featuredProducts.length) % featuredProducts.length,
-    );
-  };
+  // const showPreviousHeroSlide = () => {
+  //   setHeroSlide(
+  //     (current) => (current - 1 + featuredProducts.length) % featuredProducts.length,
+  //   );
+  // };
 
-  const showNextHeroSlide = () => {
-    setHeroSlide((current) => (current + 1) % featuredProducts.length);
-  };
+  // const showNextHeroSlide = () => {
+  //   setHeroSlide((current) => (current + 1) % featuredProducts.length);
+  // };
 
   const heroSubtitleLines = content.heroSubtitle
     .split("\n")
@@ -47,7 +47,7 @@ export function HomePage() {
     ))
     .filter(Boolean);
   const heroSubtitleLead = heroSubtitleLines[0] ?? "";
-  const heroSubtitleBullets = heroSubtitleLines.filter((_, index) => index > 0);
+  // const heroSubtitleBullets = heroSubtitleLines.filter((_, index) => index > 0);
 
   return (
     <div className="stack-xl">
